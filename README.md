@@ -1,14 +1,20 @@
-# RAG Pipeline — From Embeddings to PDF Q&A
+# AI Engineering Portfolio — RAG, Agents & Multi-Agent Systems
 
-A progressive RAG (Retrieval-Augmented Generation) pipeline built with LangChain and Ollama — from understanding embeddings to querying real PDF documents with AI.
+A progressive AI engineering portfolio built with LangChain and Ollama — from understanding embeddings to RAG pipelines, and from single-agent patterns to hierarchical multi-agent systems.
 
 ## How It Works
 
+**RAG Pipeline (Steps 1–4):**
 1. Documents (or PDF pages) are embedded into vectors using `nomic-embed-text`
 2. User question is embedded using the same model
 3. Cosine similarity finds the most relevant chunks
 4. Top matching chunks are injected into the LLM prompt as context
 5. `llama3.2` generates a grounded answer based only on the retrieved context
+
+**Multi-Agent Systems (Steps 5–6):**
+1. Multiple specialized agents (researcher, writer, reviewer, etc.) are defined with distinct system prompts
+2. Agents are chained in a sequential pipeline, each passing output to the next
+3. A manager agent can dynamically decide which agents to use based on the user's request
 
 ## Project Structure
 
@@ -17,6 +23,8 @@ A progressive RAG (Retrieval-Augmented Generation) pipeline built with LangChain
 ├── 2-test-search.js       # Build semantic search from scratch
 ├── 3-full-rag.js          # Full RAG pipeline with hardcoded knowledge base
 ├── 4-pdf-rag.js           # RAG over real PDF documents
+├── 5-multi-agent.js       # Sequential multi-agent content pipeline
+├── 6-manager-agent.js     # Hierarchical multi-agent system with manager
 ├── package.json
 └── README.md
 ```
@@ -33,6 +41,12 @@ Complete RAG chatbot for a property management knowledge base. Retrieves context
 ### Step 4 — PDF RAG (`4-pdf-rag.js`)
 The real deal. Loads any PDF, chunks it into overlapping segments, embeds all chunks, and answers questions about the document. Tested on a 68-page internship report — accurately extracted technologies, accomplishments, and project details.
 
+### Step 5 — Sequential Multi-Agent Pipeline (`5-multi-agent.js`)
+Three specialized agents — Researcher, Writer, and Reviewer — chained in a fixed sequential pipeline. Each agent has a focused system prompt and passes its output to the next. The Researcher gathers key facts, the Writer drafts a professional summary from those facts, and the Reviewer polishes the final output.
+
+### Step 6 — Hierarchical Multi-Agent System (`6-manager-agent.js`)
+A Manager agent that dynamically decides which worker agents to use and in what order based on the user's request. Five available workers (Researcher, Writer, Reviewer, Translator, Summarizer) can be composed into different pipelines. The Manager parses each request, selects the appropriate agents, and orchestrates execution — different requests produce different agent chains automatically.
+
 ## Tech Stack
 
 - **LangChain** — AI orchestration framework
@@ -48,6 +62,8 @@ The real deal. Loads any PDF, chunks it into overlapping segments, embeds all ch
 - **PDF ingestion** — reads and chunks real PDF documents with overlapping segments
 - **Hallucination prevention** — answers are grounded in retrieved context only
 - **Graceful fallback** — handles out-of-context queries ("I don't have that information")
+- **Sequential agent pipeline** — chains multiple specialized agents for content generation
+- **Hierarchical agent orchestration** — manager agent dynamically selects and orders worker agents
 - **Fully local** — runs entirely on your machine, no API keys or cloud services required
 
 ## Setup
@@ -67,6 +83,10 @@ node 3-full-rag.js          # Run the full RAG chatbot
 
 # Run PDF RAG (place your PDF as my-document.pdf)
 node 4-pdf-rag.js
+
+# Run multi-agent systems
+node 5-multi-agent.js      # Sequential pipeline
+node 6-manager-agent.js    # Hierarchical with manager
 ```
 
 ## Example Output
@@ -90,4 +110,24 @@ node 4-pdf-rag.js
    implemented backend-first methodology, designed database schema,
    API architecture, and component hierarchy ensuring scalability,
    security, and user experience.
+```
+
+**Sequential Multi-Agent Pipeline (Step 5):**
+```
+🔍 Agent 1 (Researcher) working...  ✅ done
+✍️  Agent 2 (Writer) working...     ✅ done
+🔎 Agent 3 (Reviewer) working...    ✅ done
+
+✨ FINAL OUTPUT:
+Developing a robust Node.js REST API requires attention to several key
+aspects to ensure scalability, security, and maintainability...
+```
+
+**Hierarchical Manager Agent (Step 6):**
+```
+USER REQUEST: "Research and write about JWT authentication in web applications"
+🧠 Manager decision → AGENTS: researcher, writer, reviewer
+
+USER REQUEST: "Give me a quick bullet-point summary of Docker containerization"
+🧠 Manager decision → AGENTS: researcher, summarizer, writer
 ```
